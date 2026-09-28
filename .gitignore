@@ -1,0 +1,25 @@
+# Datos originales y procesados (CRÍTICO)
+*.csv
+*.parquet
+creditcard.csv
+
+# Archivos de Estado y Caché de Terraform (SEGURIDAD)
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+crash.log
+
+# Entornos de Python y Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+
+# Configuraciones locales del editor
+.vscode/
+.DS_Store
+
+local.ipynb
