@@ -30,7 +30,7 @@ A diferencia de los enfoques tradicionales en entornos locales (Pandas/Scikit-Le
 ## 🚀 Estado del Proyecto (Roadmap)
 
 - [x] **Fase 0:** Despliegue de Infraestructura (Terraform, IAM, S3, Glue).
-- [x] **Fase 1:** Análisis Exploratorio (EDA) local y diseño de estrategia.
+- [x] **Fase 1:** [Análisis Exploratorio (EDA) local y diseño de estrategia](notebooks/1.%20EDA.ipynb).
 - [x] **Fase 2:** Serverless ETL en AWS Glue (PySpark) -> Capa Processed (Limpieza).
 - [x] **Fase 3:** Feature Engineering y Pipeline ML -> Capa Curated (ML-Ready).
 - [ ] **Fase 4:** Entrenamiento del Modelo (XGBoost en Amazon SageMaker). *(En desarrollo)*
