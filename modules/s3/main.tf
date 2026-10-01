@@ -36,6 +36,11 @@ resource "aws_s3_object" "predictions_zone" {
   key    = "predictions/"
 }
 
+resource "aws_s3_object" "models_zone" {
+  bucket = aws_s3_bucket.datalake.id
+  key    = "models/"
+}
+
 # Carpetas operativas para AWS Glue
 resource "aws_s3_object" "scripts_zone" {
   bucket = aws_s3_bucket.datalake.id

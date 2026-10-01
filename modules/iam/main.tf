@@ -95,14 +95,18 @@ data "aws_iam_policy_document" "sagemaker_permissions" {
     actions   = ["s3:GetObject", "s3:ListBucket"]
     resources = [
       var.datalake_bucket_arn,
-      "${var.datalake_bucket_arn}/curated/*"
+      "${var.datalake_bucket_arn}/curated/*",
+      "${var.datalake_bucket_arn}/models/*"
     ]
   }
 
   # Solo puede escribir los resultados finales en la capa predictions/
   statement {
     actions   = ["s3:PutObject"]
-    resources = ["${var.datalake_bucket_arn}/predictions/*"]
+    resources = [
+      "${var.datalake_bucket_arn}/predictions/*",
+      "${var.datalake_bucket_arn}/models/*"
+    ]
   }
 
   # Permisos para escribir métricas de evaluación (AUC-ROC, etc.) y logs en CloudWatch
