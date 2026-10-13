@@ -4,7 +4,7 @@ module "s3_datalake" {
 
   # ATENCIÓN: Los nombres en S3 deben ser únicos en todo el mundo.
   # Agrega una combinación única como tu nombre y el año.
-  bucket_name = "ivan-fraud-prediction-datalake-2026" 
+  bucket_name = "ivan-fraud-prediction-datalake-2026"
 }
 
 # 2. Llamamos al módulo IAM para crear los Roles
@@ -23,4 +23,7 @@ module "glue_processing" {
   # Le pasamos los outputs generados por los módulos anteriores
   datalake_bucket_name = module.s3_datalake.datalake_bucket_name
   glue_role_arn        = module.iam_roles.glue_role_arn
+
+  database_name = var.database_name
+  table_name    = var.table_name
 }

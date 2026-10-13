@@ -20,7 +20,7 @@ resource "aws_iam_role" "glue_etl_role" {
 data "aws_iam_policy_document" "glue_permissions" {
   # Lectura (Agregamos scripts/ para que lea el código y temp/ para operaciones de Spark)
   statement {
-    actions   = ["s3:GetObject", "s3:ListBucket"]
+    actions = ["s3:GetObject", "s3:ListBucket"]
     resources = [
       var.datalake_bucket_arn,
       "${var.datalake_bucket_arn}/raw/*",
@@ -30,9 +30,9 @@ data "aws_iam_policy_document" "glue_permissions" {
     ]
   }
 
-# Escritura y Borrado (Ajustado para los marcadores de directorio de Hadoop/Spark)
+  # Escritura y Borrado (Ajustado para los marcadores de directorio de Hadoop/Spark)
   statement {
-    actions   = ["s3:PutObject", "s3:DeleteObject"]
+    actions = ["s3:PutObject", "s3:DeleteObject"]
     resources = [
       "${var.datalake_bucket_arn}/processed/*",
       "${var.datalake_bucket_arn}/processed_$folder$",
@@ -51,6 +51,8 @@ data "aws_iam_policy_document" "glue_permissions" {
       "logs:PutLogEvents",
       "glue:CreateTable",
       "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetPartitions",
       "glue:UpdateTable",
       "glue:CreateDatabase",
       "glue:GetDatabase"
@@ -92,7 +94,7 @@ resource "aws_iam_role" "sagemaker_execution_role" {
 data "aws_iam_policy_document" "sagemaker_permissions" {
   # Solo puede leer los datos de entrenamiento de la capa curated/
   statement {
-    actions   = ["s3:GetObject", "s3:ListBucket"]
+    actions = ["s3:GetObject", "s3:ListBucket"]
     resources = [
       var.datalake_bucket_arn,
       "${var.datalake_bucket_arn}/curated/*",
@@ -102,7 +104,7 @@ data "aws_iam_policy_document" "sagemaker_permissions" {
 
   # Solo puede escribir los resultados finales en la capa predictions/
   statement {
-    actions   = ["s3:PutObject"]
+    actions = ["s3:PutObject"]
     resources = [
       "${var.datalake_bucket_arn}/predictions/*",
       "${var.datalake_bucket_arn}/models/*"
@@ -167,7 +169,7 @@ resource "aws_iam_role" "redshift_load_role" {
 data "aws_iam_policy_document" "redshift_permissions" {
   # Lectura estricta únicamente sobre la zona de predicciones
   statement {
-    actions   = ["s3:GetObject", "s3:ListBucket"]
+    actions = ["s3:GetObject", "s3:ListBucket"]
     resources = [
       var.datalake_bucket_arn,
       "${var.datalake_bucket_arn}/predictions/*"
