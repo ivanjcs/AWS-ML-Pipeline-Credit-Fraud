@@ -1,0 +1,23 @@
+[project]
+name = "aws-fraud-pipeline"
+version = "0.1.0"
+description = "Pipeline of fraud detection in AWS"
+authors = [
+    {name = "ivanjcs",email = "ivanelgallego2@gmail.com"}
+]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.12,<4"
+dependencies = [
+    "boto3 (>=1.43.114,<2.0.0)",
+    "sagemaker (>=3.25.0,<4.0.0)",
+    "xgboost (<3.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false

@@ -46,15 +46,15 @@ resource "aws_glue_catalog_table" "raw_transactions" {
   }
 }
 
-# 3. Glue ETL Job: El motor Spark Serverless
-resource "aws_glue_job" "etl_processor" {
-  name     = "fraud_etl_processor"
+# --- JOB 1: INGESTION ---
+resource "aws_glue_job" "ingestion_processor" {
+  name     = "fraud_etl_ingestion"
   role_arn = var.glue_role_arn
 
   # Definimos que usará PySpark y la ruta donde subiremos el script más adelante
   command {
     name            = "glueetl"
-    script_location = "s3://${var.datalake_bucket_name}/scripts/fraud_etl.py"
+    script_location = "s3://${var.datalake_bucket_name}/scripts/fraud_etl_ingestion.py"
     python_version  = "3"
   }
 
@@ -70,5 +70,31 @@ resource "aws_glue_job" "etl_processor" {
     "--DATABASE_NAME"                = var.database_name
     "--TABLE_NAME"                   = var.table_name
     "--enable-observability-metrics" = "true" # para ver métricas
+  }
+}
+
+# --- JOB 2: CURATION ---
+resource "aws_glue_job" "curation_processor" {
+  name     = "fraud_etl_curation"
+  role_arn = var.glue_role_arn
+
+  command {
+    name            = "glueetl"
+    script_location = "s3://${var.datalake_bucket_name}/scripts/fraud_etl_curation.py"
+    python_version  = "3"
+  }
+
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+
+  default_arguments = {
+    # Este Job NO usa Bookmarks porque lee el set procesado completo cada vez
+    "--job-bookmark-option"          = "job-bookmark-disable" 
+    "--enable-auto-scaling"          = "true"
+    "--TempDir"                      = "s3://${var.datalake_bucket_name}/temp/"
+    "--BUCKET_NAME"                  = var.datalake_bucket_name
+    # No necesita DATABASE_NAME ni TABLE_NAME porque lee directo de S3
+    "--enable-observability-metrics" = "true"
   }
 }

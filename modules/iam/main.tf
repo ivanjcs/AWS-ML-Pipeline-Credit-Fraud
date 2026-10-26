@@ -92,18 +92,26 @@ resource "aws_iam_role" "sagemaker_execution_role" {
 
 # 3. Política de Permisos: Mínimo privilegio para Machine Learning
 data "aws_iam_policy_document" "sagemaker_permissions" {
-  # Solo puede leer los datos de entrenamiento de la capa curated/
+  # Lectura de objetos: datos de entrenamiento (curated/) y artefactos del modelo (models/)
   statement {
-    actions = ["s3:GetObject", "s3:ListBucket"]
+    sid       = "ReadCuratedAndModels"
+    actions   = ["s3:GetObject"]
     resources = [
-      var.datalake_bucket_arn,
       "${var.datalake_bucket_arn}/curated/*",
       "${var.datalake_bucket_arn}/models/*"
     ]
   }
 
-  # Solo puede escribir los resultados finales en la capa predictions/
+  # Listado: es una acción a nivel bucket, no a nivel objeto
   statement {
+    sid       = "ListBucket"
+    actions   = ["s3:ListBucket"]
+    resources = [var.datalake_bucket_arn]
+  }
+
+  # Escritura: artefactos del modelo y predicciones del Batch Transform
+  statement {
+    sid       = "WriteModelsAndPredictions"
     actions = ["s3:PutObject"]
     resources = [
       "${var.datalake_bucket_arn}/predictions/*",
@@ -111,20 +119,45 @@ data "aws_iam_policy_document" "sagemaker_permissions" {
     ]
   }
 
-  # Permisos para escribir métricas de evaluación (AUC-ROC, etc.) y logs en CloudWatch
+  # Logs de los jobs, acotados al prefijo de SageMaker
   statement {
-    actions = [
+    sid       = "CloudWatchLogs"
+    actions   = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
-      "cloudwatch:PutMetricData"
+      "logs:DescribeLogStreams"
     ]
+    resources = ["arn:aws:logs:*:*:log-group:/aws/sagemaker/*"]
+  }
+
+  # PutMetricData no admite recurso específico
+  statement {
+    sid       = "CloudWatchMetrics"
+    actions   = ["cloudwatch:PutMetricData"]
     resources = ["*"]
   }
 
   # PERMISO CLAVE: Necesario para que SageMaker pueda descargar el algoritmo XGBoost (built-in)
   statement {
     actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:CreateNetworkInterfacePermission",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DeleteNetworkInterfacePermission",
+      "ec2:DescribeDhcpOptions",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeVpcs"
+    ]
+    resources = ["*"]
+  }
+
+  # Descargar la imagen del algoritmo built-in de XGBoost
+  statement {
+    sid       = "EcrPullBuiltInAlgorithm"
+    actions   = [
       "ecr:GetAuthorizationToken",
       "ecr:BatchCheckLayerAvailability",
       "ecr:GetDownloadUrlForLayer",
