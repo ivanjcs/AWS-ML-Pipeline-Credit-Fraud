@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "datalake" {
   bucket = var.bucket_name
 
   # Permitimos que Terraform pueda borrar el bucket en el futuro aunque tenga archivos dentro (ideal para entornos de desarrollo)
-  force_destroy = true 
+  force_destroy = true
 }
 
 # 2. Bloqueo de Acceso Público (Seguridad de grado empresarial)

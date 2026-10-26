@@ -48,7 +48,7 @@ resource "aws_glue_catalog_table" "raw_transactions" {
 
 # --- JOB 1: INGESTION ---
 resource "aws_glue_job" "ingestion_processor" {
-  name     = "fraud_etl_processor"
+  name     = "fraud_etl_ingestion"
   role_arn = var.glue_role_arn
 
   # Definimos que usará PySpark y la ruta donde subiremos el script más adelante
